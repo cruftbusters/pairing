@@ -4,7 +4,7 @@ import useWebSocket from 'react-use-websocket'
 function App() {
   const [message, setMessage] = useState()
   const { sendMessage, lastMessage } = useWebSocket(
-    'wss://6cf3-184-105-52-168.ngrok.io/ping',
+    'wss://pairing-ws.cruftbusters.com/ping',
   )
   return (
     <div>
