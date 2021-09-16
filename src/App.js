@@ -4,7 +4,7 @@ import useWebSocket from 'react-use-websocket'
 function App() {
   const [message, setMessage] = useState()
   const { sendMessage, lastMessage } = useWebSocket(
-    'ws://6.tcp.ngrok.io:17616/ping',
+    'wss://6cf3-184-105-52-168.ngrok.io/ping',
   )
   return (
     <div>
