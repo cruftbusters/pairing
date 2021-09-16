@@ -1,0 +1,18 @@
+{
+  "Comment": "Create CNAME for pairing.cruftbusters.com",
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "pairing.cruftbusters.com",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": ""
+          }
+        ]
+      }
+    }
+  ]
+}

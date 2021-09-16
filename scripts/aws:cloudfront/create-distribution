@@ -1,0 +1,8 @@
+#!/bin/zsh
+distributionConfig=$(jq "
+.CallerReference=\"`uuidgen`\"
+  | .ViewerCertificate.ACMCertificateArn=\"arn:aws:acm:us-east-1:552879364626:certificate/5f89e304-aa01-4af1-9c71-3cffc8824198\"
+  " scripts/aws:cloudfront/distribution-config.json)
+aws cloudfront create-distribution \
+  --distribution-config file://<(echo $distributionConfig) | \
+  jq .Distribution.Id -r | tr -d '\n' > scripts/aws:cloudfront/distribution-id

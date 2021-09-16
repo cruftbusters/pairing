@@ -1,0 +1,4 @@
+#!/bin/zsh
+
+jq '.scripts.sync="scripts/aws:s3/sync"|.scripts.invalidate="scripts/aws:cloudfront/invalidate"|.scripts.build="react-scripts build && scripts/compress-build.mjs"' package.json > package.json.jq
+mv package.json.jq package.json

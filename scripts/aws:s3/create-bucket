@@ -1,0 +1,16 @@
+#!/bin/zsh
+aws s3api create-bucket \
+  --acl public-read \
+  --bucket pairing.cruftbusters.com
+
+aws s3api put-bucket-cors \
+  --bucket pairing.cruftbusters.com \
+  --cors-configuration file://scripts/aws:s3/cors-configuration.json
+
+aws s3api put-bucket-policy \
+  --bucket pairing.cruftbusters.com \
+  --policy file://scripts/aws:s3/bucket-policy.json
+
+aws s3api put-bucket-website \
+  --bucket pairing.cruftbusters.com \
+  --website-configuration file://scripts/aws:s3/website-configuration.json
