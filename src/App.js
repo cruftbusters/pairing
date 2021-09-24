@@ -1,35 +1,62 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
 function App() {
   const [message, setMessage] = useState('')
-  const [history, setHistory] = useState([])
-  const { sendMessage, lastMessage } = useWebSocket(
-    'wss://pairing-ws.cruftbusters.com/chat',
+  const [id, setId] = useState()
+  const { sendMessage } = useWebSocket(
+    'wss://pairing-ws.cruftbusters.com/session',
+    {
+      onClose: () => setId(undefined),
+      onMessage: ({ data }) => {
+        if (id === undefined) {
+          setId(data)
+        } else {
+          setMessage(data)
+        }
+      },
+    },
   )
+
+  const lastMessageRef = useRef()
   useEffect(() => {
-    if (!lastMessage) return
-    setHistory((history) => history.concat([lastMessage.data]))
-  }, [lastMessage])
+    if (message === lastMessageRef.current) return
+    sendMessage(message)
+  }, [message, sendMessage])
 
   return (
-    <div>
-      {history.map((message, index) => (
-        <div key={index}>{message}</div>
-      ))}
-      <input
-        onChange={(e) => setMessage(e.target.value)}
-        value={message}
-      />
-      <button
-        onClick={() => {
-          sendMessage(message)
-          setHistory((history) => history.concat([message]))
-          setMessage('')
+    <div
+      style={{
+        backgroundColor: 'black',
+        color: 'white',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div
+        style={{
+          padding: '0.25em',
         }}
       >
-        send
-      </button>
+        {id}
+      </div>
+      <textarea
+        value={message}
+        onChange={(e) => {
+          sendMessage(e.target.value)
+          setMessage(e.target.value)
+        }}
+        style={{
+          flex: 1,
+          padding: '0.25em',
+          border: 0,
+          margin: 0,
+          resize: 'none',
+          boxSizing: 'border-box',
+          minWidth: '100%',
+        }}
+      />
     </div>
   )
 }
