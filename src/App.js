@@ -1,28 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
+const useId = () => {
+  const id = useRef()
+  if (id.current !== undefined) return id.current
+  const { pathname } = window.location
+  const match = pathname.match(/\/([0-9a-fA-F-]{36})/)
+  if (match === null) return id.current
+  id.current = match[1]
+  return id.current
+}
+
 function App() {
-  const [message, setMessage] = useState('')
-  const [id, setId] = useState()
-  const { sendMessage } = useWebSocket(
-    'wss://pairing-ws.cruftbusters.com/session',
-    {
-      onClose: () => setId(undefined),
-      onMessage: ({ data }) => {
-        if (id === undefined) {
-          setId(data)
-        } else {
-          setMessage(data)
-        }
-      },
-    },
+  const pathId = useId()
+  const [id, setId] = useState(pathId)
+  const { sendMessage, lastMessage } = useWebSocket(
+    `wss://pairing-ws.cruftbusters.com/session${
+      pathId ? `/${pathId}` : ''
+    }`,
   )
 
-  const lastMessageRef = useRef()
+  const [message, setMessage] = useState('')
   useEffect(() => {
-    if (message === lastMessageRef.current) return
-    sendMessage(message)
-  }, [message, sendMessage])
+    if (id === undefined && lastMessage !== null) setId(lastMessage.data)
+  }, [id, lastMessage])
+  useEffect(() => {
+    if (id !== undefined && lastMessage !== null)
+      setMessage(lastMessage.data)
+  }, [lastMessage])
 
   return (
     <div
@@ -39,7 +44,9 @@ function App() {
           padding: '0.25em',
         }}
       >
-        {id}
+        {`${window.location.protocol}//${window.location.host}/session${
+          id ? `/${id}` : ''
+        }`}
       </div>
       <textarea
         value={message}
