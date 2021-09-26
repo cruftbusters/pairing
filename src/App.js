@@ -11,23 +11,31 @@ const useId = () => {
   return id.current
 }
 
+const getSessionUri = (id) =>
+  `wss://pairing-ws.cruftbusters.com/session${id ? `/${id}` : ''}`
+
+const getJoinSessionUrl = (id) =>
+  `${window.location.protocol}//${window.location.host}/session${
+    id ? `/${id}` : ''
+  }`
+
 function App() {
   const pathId = useId()
   const [id, setId] = useState(pathId)
-  const { sendMessage, lastMessage } = useWebSocket(
-    `wss://pairing-ws.cruftbusters.com/session${
-      pathId ? `/${pathId}` : ''
-    }`,
-  )
+  const { sendMessage, lastMessage } = useWebSocket(getSessionUri(pathId))
 
   const [message, setMessage] = useState('')
   useEffect(() => {
     if (id === undefined && lastMessage !== null) setId(lastMessage.data)
   }, [id, lastMessage])
   useEffect(() => {
-    if (id !== undefined && lastMessage !== null)
+    if (
+      lastMessage !== null &&
+      id !== undefined &&
+      lastMessage.data !== id
+    )
       setMessage(lastMessage.data)
-  }, [lastMessage])
+  }, [id, lastMessage])
 
   return (
     <div
@@ -44,9 +52,7 @@ function App() {
           padding: '0.25em',
         }}
       >
-        {`${window.location.protocol}//${window.location.host}/session${
-          id ? `/${id}` : ''
-        }`}
+        {getJoinSessionUrl(id)}
       </div>
       <textarea
         value={message}
